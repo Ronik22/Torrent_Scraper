@@ -24,7 +24,7 @@ def get_torrent_link(base_url):
         mylist[c]["Name"] = text
         mylist[c]["Torrent_Link"] = link
         get_magnet_link(c,link)
-        time.sleep(0.5)
+        time.sleep(0.4)
         c += 1
 
 
@@ -45,7 +45,7 @@ def main():
     print("2. All Trending")
     print("3. Trending in a catagory")
     print("4. Top 100 in a catagory\n")
-    print("Catagories: movies,television,games,applications,music,documentaries,anime,other")
+    print("Categories: movies,television,games,applications,music,documentaries,anime,other")
     print("\n------------------------------------------\n")
 
     choice = int(input("Enter choice: "))
@@ -56,11 +56,11 @@ def main():
     elif choice == 2:
         query1 = 'trending'
     elif choice == 3:
-        search_catagory = input("Enter catagory: ")
-        query1 = f'trending/d/{search_catagory}'
+        search_category = input("Enter category: ")
+        query1 = f'trending/d/{search_category}'
     elif choice == 4:
-        search_catagory = input("Enter catagory: ")
-        query1 = f'top-100-{search_catagory}'
+        search_category = input("Enter category: ")
+        query1 = f'top-100-{search_category}'
     else:
         print("Wrong choice")
         exit()
