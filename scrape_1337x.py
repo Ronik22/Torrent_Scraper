@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import json
+import argparse
 import time
 
 mylist = {}
@@ -40,41 +41,37 @@ def get_magnet_link(sn,turl):
 
 
 def main():
-    print("\n------------------ MENU ------------------\n")
-    print("1. Normal Search")
-    print("2. All Trending")
-    print("3. Trending in a catagory")
-    print("4. Top 100 in a catagory\n")
-    print("Categories: movies,television,games,applications,music,documentaries,anime,other")
-    print("\n------------------------------------------\n")
 
-    choice = int(input("Enter choice: "))
+    parser = argparse.ArgumentParser(description='Scrapes 1337x and provides 1st 50 torrent links along with their magnet links')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-n", "--normal", type=str, help="Normal Search query", metavar='')
+    group.add_argument("-tr", "--trending", action="store_true", help="All Trending")
+    group.add_argument("-trc", "--trendingc", type=str, help="Trending Search (category as a query)", choices=['movies','television','games','applications','music','documentaries','anime','other'])
+    group.add_argument("-t", "--top", type=str, help="Top 100 Search (category as a query)", choices=['movies','television','games','applications','music','documentaries','anime','other'])
+    args = parser.parse_args()
     
-    if choice == 1:
-        search_item = input("Enter search item: ")
-        query1 = f'search/{search_item}/1/'
-    elif choice == 2:
+    if args.normal:
+        query1 = f'search/{args.normal}/1/'
+    elif args.trending:
         query1 = 'trending'
-    elif choice == 3:
-        search_category = input("Enter category: ")
-        query1 = f'trending/d/{search_category}'
-    elif choice == 4:
-        search_category = input("Enter category: ")
-        query1 = f'top-100-{search_category}'
+    elif args.trendingc:
+        query1 = f'trending/d/{args.trendingc}'
+    elif args.top:
+        query1 = f'top-100-{args.top}'
     else:
-        print("Wrong choice")
+        parser.print_help()
         exit()
 
     base_url = f'https://www.1377x.to/{query1}'
     print("Please wait till the data has been scraped...")
     get_torrent_link(base_url)
 
-    with open('1337x_links.txt', 'w') as outfile:
-        outfile.write(f"BASE URL: {base_url}\n\n")
+    with open('1337x_links.json', 'w') as outfile:
+        # outfile.write(f"BASE URL: {base_url}\n\n")
         json.dump(mylist, outfile, indent=4)
     
     # print(json.dumps(mylist, indent=4))
-    print("Operation completed")
+    print(f"Operation completed considering base url as '{base_url}'")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import argparse
 import json
 
 mylist = {}
@@ -36,32 +37,29 @@ def get_torrent_link(base_url):
 
 
 def main():
-    print("\n------------------ MENU ------------------\n")
-    print("1. Normal Search")
-    print("2. Recent Torrents")
-    print("3. Top 100 in a category\n")
-    print("Categories: audio,video,applications,games,other")
-    print("\n------------------------------------------\n")
 
-    choice = int(input("Enter choice: "))
+    parser = argparse.ArgumentParser(description='Scrapes piratebay and provides 1st 30 torrent links along with their magnet links')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-n", "--normal", type=str, help="Normal Search query", metavar='')
+    group.add_argument("-r", "--recent", action="store_true", help="Recent Search")
+    group.add_argument("-t", "--top", type=str, help="Top 100 Search (category as a query)", choices=['audio', 'video', 'applications', 'games', 'other'])
+    args = parser.parse_args()
     
-    if choice == 1:
-        search_item = input("Enter search item: ")
-        query1 = f'search/{search_item}/1/'
-    elif choice == 2:
+    if args.normal:
+        query1 = f'search/{args.normal}/1/'
+    elif args.recent:
         query1 = 'recent'
-    elif choice == 3:
-        search_category = input("Enter category: ")
-        marks = {
+    elif args.top:
+        catg_choice = {
             "audio":100,
             "video":200,
             "applications":300,
             "games":400,
             "other":600,
         }
-        query1 = f'top/{marks[search_category]}'
+        query1 = f'top/{catg_choice[args.top]}'
     else:
-        print("Wrong choice")
+        parser.print_help()
         exit()
 
     base_url = f'https://thepiratebay10.org/{query1}'
@@ -69,12 +67,12 @@ def main():
     print("Please wait till the data has been scraped...")
     get_torrent_link(base_url)
 
-    with open('piratebay_links.txt', 'w') as outfile:
-        outfile.write(f"BASE URL: {base_url}\n\n")
+    with open('piratebay_links.json', 'w') as outfile:
+        # outfile.write(f"BASE URL: {base_url}\n\n")
         json.dump(mylist, outfile, indent=4)
     
     # print(json.dumps(mylist, indent=4))
-    print("Operation completed")
+    print(f"Operation completed considering base url as '{base_url}'")
 
 
 if __name__ == "__main__":
